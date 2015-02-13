@@ -1,4 +1,9 @@
-# Reproducible Research: Peer Assessment 1
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: true
+---
 
 
 ## Loading and preprocessing the data
@@ -54,7 +59,7 @@ axis.POSIXct(1,
             las = 2)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png) 
 
 Now let's calculate mean and median total number of steps taken per day ignoring missing values.
 
@@ -87,7 +92,7 @@ steps_per_interval <- group_by(data, interval) %>%
 plot(steps_per_interval, type = "l", main = "Average steps taken during the day")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
 
 If you would ask me which interval has most steps, I'd answer:  
 "And the winner is ... interval **835** with **206.1698113** steps on average!!!"
@@ -162,7 +167,7 @@ axis.POSIXct(1,
             las = 2)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
+![plot of chunk unnamed-chunk-10](figure/unnamed-chunk-10-1.png) 
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
@@ -190,4 +195,4 @@ f_steps <- f_data %>%
 xyplot(steps ~ interval, data = f_steps, type = "l", groups = day_type, auto.key = T)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
