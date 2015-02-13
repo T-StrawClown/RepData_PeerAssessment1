@@ -1,25 +1,29 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
 
 Not much to say here...
 
-```{r, echo=TRUE}
+
+```r
 data <- read.csv("activity.csv", stringsAsFactors = F)
 str(data)
+```
+
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : chr  "2012-10-01" "2012-10-01" "2012-10-01" "2012-10-01" ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
 ## What is mean total number of steps taken per day?
 
 I'm going to use dplyr, lubridate and lattice libraries, so make sure you have them installed.
 
-```{r, echo = T, message = F}
+
+```r
 library(dplyr)
 library(lubridate)
 library(lattice)
@@ -27,7 +31,8 @@ library(lattice)
 
 Let's draw histogram of steps per day. I changed some formating, just wanted to play with plot a little bit...  
 
-``` {r, echo=T}
+
+```r
 # histogram - steps per day
 steps_per_day <- group_by(data, date = ymd(date)) %>%
         summarise(steps_total = sum(steps, na.rm = T)) %>%
@@ -49,50 +54,83 @@ axis.POSIXct(1,
             las = 2)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
 Now let's calculate mean and median total number of steps taken per day ignoring missing values.
 
-``` {r, echo=TRUE}
+
+```r
 mean(steps_per_day$steps_total, na.rm = T)
+```
+
+```
+## [1] 9354.23
+```
+
+```r
 median(steps_per_day$steps_total, na.rm = T)
+```
+
+```
+## [1] 10395
 ```
 
 ## What is the average daily activity pattern?
 
 Here is graphical representation of daily activity pattern.
 
-```{r, echo=TRUE}
+
+```r
 steps_per_interval <- group_by(data, interval) %>%
         summarise(steps_avg = mean(steps, na.rm = T)) %>%
         arrange(interval)
 plot(steps_per_interval, type = "l", main = "Average steps taken during the day")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+
 If you would ask me which interval has most steps, I'd answer:  
-"And the winner is ... interval **`r steps_per_interval$interval[steps_per_interval$steps_avg == max(steps_per_interval$steps_avg)]`** with **`r max(steps_per_interval$steps_avg)`** steps on average!!!"
+"And the winner is ... interval **835** with **206.1698113** steps on average!!!"
 
 Traditional way it would look like this. 5-minute interval containing the maximum number of steps is:
 
-```{r, echo=TRUE}
+
+```r
 steps_per_interval$interval[steps_per_interval$steps_avg == max(steps_per_interval$steps_avg)]
+```
+
+```
+## [1] 835
 ```
 
 ## Imputing missing values
 
 So first thing we do is calculate the total number of missing values. Like this
 
-```{r, echo=TRUE}
+
+```r
 sum(is.na(data$steps))
+```
+
+```
+## [1] 2304
 ```
 
 or like this
 
-``` {r, echo=TRUE}
+
+```r
 sum(!complete.cases(data))
+```
+
+```
+## [1] 2304
 ```
 
 Fortunatelly in our case only 'steps' has missing values. So let's replace them with the average number steps for the same 5-minute interval, rounded to integer number:
 
-``` {r, echo=TRUE}
+
+```r
 f_data <- data %>%
         group_by(interval) %>%
         mutate(steps = replace(steps,
@@ -102,7 +140,8 @@ f_data <- data %>%
 
 Now the same histogram as the first one, just based on corrected data.
 
-``` {r, echo=TRUE}
+
+```r
 f_steps_per_day <- group_by(f_data, date = ymd(date)) %>%
         summarise(steps_total = sum(steps, na.rm = T)) %>%
         arrange(date)
@@ -123,11 +162,14 @@ axis.POSIXct(1,
             las = 2)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
+
 ## Are there differences in activity patterns between weekdays and weekends?
 
 Now let's add new factor column called day_type to our dataset. It will mark if the day is weekday or weekend.
 
-``` {r, echo=TRUE}
+
+```r
 f_data <- f_data %>%
         mutate(day_type = as.factor(ifelse(wday(date) %in% c(1,7),
                                            "weekend",
@@ -136,7 +178,8 @@ f_data <- f_data %>%
 
 If I would want to compare trends, I'd like to see this.
 
-``` {r, echo=TRUE}
+
+```r
 f_steps <- f_data %>%
         mutate(day_type = as.factor(ifelse(wday(date) %in% c(1,7),
                                            "weekend",
@@ -146,3 +189,5 @@ f_steps <- f_data %>%
         arrange(interval)
 xyplot(steps ~ interval, data = f_steps, type = "l", groups = day_type, auto.key = T)
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
